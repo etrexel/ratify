@@ -37,7 +37,7 @@ import (
 
 	"github.com/notaryproject/notation-go"
 	"github.com/notaryproject/notation-go/crypto/jwsutil"
-	"github.com/notaryproject/notation-go/signature/jws"
+	nv2verify "github.com/notaryproject/notation-go/signature"
 	oci "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -55,7 +55,7 @@ type NotaryV2VerifierConfig struct {
 
 type notaryV2Verifier struct {
 	artifactTypes    []string
-	notationVerifier *jws.Verifier
+	notationVerifier *nv2verify.Verifier
 }
 
 type notaryv2VerifierFactory struct{}
@@ -195,8 +195,8 @@ func getCert(refBlob []byte) (*x509.Certificate, error) {
 	return cert, nil
 }
 
-func getVerifierService(certPaths ...string) (*jws.Verifier, error) {
-	roots := x509.NewCertPool()
+func getVerifierService(certPaths ...string) (*nv2verify.Verifier, error) {
+	roots := make([]*x509.Certificate, 0)
 	for _, path := range certPaths {
 
 		bundledCerts, err := utils.GetCertificatesFromPath(path)
@@ -205,11 +205,10 @@ func getVerifierService(certPaths ...string) (*jws.Verifier, error) {
 			return nil, err
 		}
 
-		for _, cert := range bundledCerts {
-			roots.AddCert(cert)
-		}
+		roots = append(roots, bundledCerts...)
 	}
-	verifier := jws.NewVerifier()
-	verifier.VerifyOptions.Roots = roots
-	return verifier, nil
+	nv2Verifier := nv2verify.NewVerifier()
+	nv2Verifier.TrustedCerts = roots
+
+	return nv2Verifier, nil
 }
