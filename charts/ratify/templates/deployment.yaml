@@ -9,6 +9,9 @@ spec:
   replicas: 1
   selector:
     matchLabels:
+      {{- if .Values.oras.authProviders.azureManagedIdentity }}
+      aadpodidbinding: {{ .Values.azureManagedIdentityConfig.name }}
+      {{- end }}
       {{- include "ratify.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -49,6 +52,10 @@ spec:
               readOnly: true
           {{- end }}
           env:
+          {{- .Values.oras.authProviders.azureManagedIdentity }}
+            - name: AZURE_TENANT_ID
+              value: {{ .Values.azureManagedIdentityConfig.tenantID }}
+          {{- end }}
           {{- if $dockerAuthMode }}
             - name: DOCKER_CONFIG
               value: "/usr/local/docker"

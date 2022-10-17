@@ -4,6 +4,7 @@ image:
   pullPolicy: IfNotPresent
 nameOverride: ""
 fullnameOverride: ""
+executionMode: ""
 ratifyTestCert: |
   -----BEGIN CERTIFICATE-----
   MIIDAzCCAeugAwIBAgIQdbFNMJJ7bsCjFz9NTjm60TANBgkqhkiG9w0BAQsFADAW
@@ -51,8 +52,14 @@ akvCertConfig:
   cert2Name:
   tenantId:
 
+azureManagedIdentityConfig:
+  name:
+  clientID:
+  tenantID:
+
 oras:
   authProviders:
     azureWorkloadIdentityEnabled: false
+    azureManagedIdentity: false
     k8secretsEnabled: false
     awsEcrBasicEnabled: false

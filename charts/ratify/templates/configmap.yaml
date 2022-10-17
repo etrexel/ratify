@@ -6,6 +6,9 @@ data:
   config.json: |
     {
       "executor": {
+        {{- if .Values.executionMode == "passthrough" }}
+        "executionMode": "passthrough",
+        {{- end }}
         "requestTimeout": 6800
       },
       "store": {
@@ -33,6 +36,13 @@ data:
                 ,
                 "authProvider": {
                     "name": "awsEcrBasic"
+                }
+                {{- end }}
+                {{- if .Values.oras.authProviders.azureManagedIdentity }}
+                ,
+                "authProvider": {
+                    "name": "azureManagedIdentity",
+                    "clientID": {{ .Values.azureManagedIdentityConfig.clientID }}
                 }
                 {{- end }}
             }
